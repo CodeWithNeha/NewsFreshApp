@@ -4,15 +4,18 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import org.w3c.dom.Text
 import java.util.ArrayList
 
-class NewsListAdapter( private val listener: MainActivity): RecyclerView.Adapter<NewsviewHolder>() {
+class NewsListAdapter( private val listener: NewsItemClicked): RecyclerView.Adapter<NewsViewHolder>() {
     private val items: ArrayList<News> = ArrayList()
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NewsviewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NewsViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_news,parent,false)
-        val viewHolder = NewsviewHolder(view)
+        val viewHolder = NewsViewHolder(view)
         view.setOnClickListener {
             listener.onItemClicked(items[viewHolder.adapterPosition])
         }
@@ -20,17 +23,19 @@ class NewsListAdapter( private val listener: MainActivity): RecyclerView.Adapter
 
     }
 
-    override fun onBindViewHolder(holder: NewsviewHolder, position: Int) {
+    override fun onBindViewHolder(holder: NewsViewHolder, position: Int) {
         val currentItem = items[position]
         holder.titleView.text = currentItem.title
+        holder.author.text = currentItem.author
+        Glide.with(holder.itemView.context).load(currentItem.imageUrl).into(holder.image)
     }
 
     override fun getItemCount(): Int {
         return items.size
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    fun updateNews(updatedNews: ArrayList<News>){
+
+    fun updateNews(updatedNews: ArrayList<News> ){
         items.clear()
         items.addAll(updatedNews)
 
@@ -38,8 +43,10 @@ class NewsListAdapter( private val listener: MainActivity): RecyclerView.Adapter
     }
 
 }
-class NewsviewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
-    val titleView: TextView = itemView.findViewById(R.id.title)
+class NewsViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
+    val titleView: TextView = itemView.findViewById<TextView>(R.id.title)
+    val image: ImageView = itemView.findViewById<ImageView>(R.id.image)
+    val author: TextView = itemView.findViewById<TextView>(R.id.author)
 }
 
 interface NewsItemClicked{
